@@ -12,7 +12,7 @@ with open('label_encoder.pkl', 'rb') as encoder_file:
     label_encoder = pickle.load(encoder_file)
 
 # Load the dataset for feature options
-df = pd.read_csv('mushrooms.csv')
+df = pd.read_csv('D:\\IQUBE\\INEURON\\mushrooms.csv')
 
 # All features used in training
 all_features = [
@@ -24,7 +24,7 @@ all_features = [
 ]
 
 # Selected features for classification
-selected_features = ['gill-size', 'population', 'habitat', 'bruises', 'gill-color', 'ring-type']
+selected_features = [ 'bruises','gill-size','gill-spacing', 'gill-color','stalk-surface-below-ring','veil-color', 'ring-type','population', 'habitat', ]
 
 # Streamlit Interface
 st.title('Mushroom Classification')
@@ -55,14 +55,21 @@ input_df = pd.DataFrame([input_data], columns=all_features)
 # Prediction button
 if st.button('Classify'):
     prediction = model.predict(input_df)[0]
-    prediction_prob = model.predict_proba(input_df)[:, -1][0]  # Probability of the positive class
-    
-    # Switch-like logic for output
+    prediction_prob = model.predict_proba(input_df)[0]  # Get probabilities for both classes
+
+    # Extract probabilities for edible and poisonous
+    edible_prob = prediction_prob[0]  # Probability for edible (class 0)
+    poisonous_prob = prediction_prob[1]  # Probability for poisonous (class 1)
+
+    # Display probabilities and result
     if prediction == 1:  # Poisonous
-        st.error(f"Prediction: Poisonous (Probability: {prediction_prob:.2f})")
+        st.error(f"Prediction: Poisonous (Probability: {poisonous_prob:.2%})")
         st.warning("Warning! This mushroom is highly poisonous. Avoid consumption!")
     elif prediction == 0:  # Edible
-        st.success(f"Prediction: Edible (Probability: {prediction_prob:.2f})")
+        st.success(f"Prediction: Edible (Probability: {edible_prob:.2%})")
         st.info("This mushroom is safe to eat. Enjoy!")
-    else:
-        st.error("Unexpected prediction result.")
+
+    # Show detailed probabilities
+    st.write("Prediction Probabilities:")
+    st.write(f"Edible: {edible_prob:.2%}")
+    st.write(f"Poisonous: {poisonous_prob:.2%}")
