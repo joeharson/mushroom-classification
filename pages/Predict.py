@@ -7,7 +7,6 @@ import pickle
 # Load the trained model and LabelEncoder
 with open('model.pkl', 'rb') as model_file:
     model = pickle.load(model_file)
-
 with open('label_encoder.pkl', 'rb') as encoder_file:
     label_encoder = pickle.load(encoder_file)
 
