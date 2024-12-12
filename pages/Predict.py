@@ -11,7 +11,7 @@ with open('label_encoder.pkl', 'rb') as encoder_file:
     label_encoder = pickle.load(encoder_file)
 
 # Load the dataset for feature options
-df = pd.read_csv('D:\\IQUBE\\INEURON\\mushrooms.csv')
+df = pd.read_csv('mushrooms.csv')
 
 # All features used in training
 all_features = [
