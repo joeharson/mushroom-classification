@@ -20,13 +20,6 @@ try:
 except Exception as e:
     logging.error(f"Error loading model: {e}")
 
-try:
-    with open('label_encoder.pkl', 'rb') as encoder_file:
-        label_encoder = pickle.load(encoder_file)
-    logging.info("LabelEncoder loaded successfully.")
-except Exception as e:
-    logging.error(f"Error loading LabelEncoder: {e}")
-
 # Load the dataset for feature options
 try:
     df = pd.read_csv('mushrooms.csv')
@@ -49,6 +42,19 @@ selected_features = [
     'stalk-surface-below-ring', 'veil-color', 'ring-type', 'population', 'habitat',
 ]
 
+# Define manual encoding (similar to your second code)
+label_encoders = {
+    'bruises': {'no bruises': 0, 'bruises': 1},
+    'gill-size': {'narrow': 0, 'broad': 1},
+    'gill-spacing': {'close': 0, 'crowded': 1, 'distant': 2},
+    'gill-color': {'black': 0, 'brown': 1, 'buff': 2, 'chocolate': 3, 'gray': 4, 'green': 5, 'orange': 6, 'pink': 7, 'purple': 8, 'red': 9, 'white': 10, 'yellow': 11},
+    'stalk-surface-below-ring': {'fibrous': 0, 'scaly': 1, 'silky': 2, 'smooth': 3},
+    'veil-color': {'brown': 0, 'orange': 1, 'white': 2, 'yellow': 3},
+    'ring-type': {'cobwebby': 0, 'evanescent': 1, 'flaring': 2, 'large': 3, 'none': 4, 'pendant': 5, 'sheathing': 6, 'zone': 7},
+    'population': {'abundant': 0, 'clustered': 1, 'numerous': 2, 'scattered': 3, 'several': 4, 'solitary': 5},
+    'habitat': {'grasses': 0, 'leaves': 1, 'meadows': 2, 'paths': 3, 'urban': 4, 'waste': 5, 'woods': 6}
+}
+
 # Streamlit Interface
 st.title('Mushroom Classification')
 
@@ -63,8 +69,8 @@ for feature in selected_features:
 input_data = []
 for feature in all_features:
     if feature in selected_features:
-        if user_inputs[feature] in label_encoder.classes_:
-            input_data.append(label_encoder.transform([user_inputs[feature]])[0])
+        if user_inputs[feature] in label_encoders[feature]:
+            input_data.append(label_encoders[feature][user_inputs[feature]])
         else:
             # Handle unseen labels
             logging.warning(f"Unseen label encountered: {user_inputs[feature]} for feature {feature}")
@@ -92,7 +98,7 @@ if st.button('Classify'):
         edible_prob = prediction_prob[0]  # Probability for edible (class 0)
         poisonous_prob = prediction_prob[1]  # Probability for poisonous (class 1)
 
-        # Display probabilities and result
+        # Display probabilities and result with full words
         if prediction == 1:  # Poisonous
             st.error(f"Prediction: Poisonous (Probability: {poisonous_prob:.2%})")
             st.warning("Warning! This mushroom is highly poisonous. Avoid consumption!")
