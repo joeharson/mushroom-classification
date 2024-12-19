@@ -64,12 +64,10 @@ input_data = []
 for feature in all_features:
     if feature in selected_features:
         if user_inputs[feature] in label_encoder.classes_:
-            # If the input is in the encoder's classes, encode it
             input_data.append(label_encoder.transform([user_inputs[feature]])[0])
         else:
-            # Handle unseen labels by appending a default value (0)
+            # Handle unseen labels
             logging.warning(f"Unseen label encountered: {user_inputs[feature]} for feature {feature}")
-            st.warning(f"Unseen label '{user_inputs[feature]}' encountered for {feature}. Defaulting to '0'.")
             input_data.append(0)  # Default value for unseen labels
     else:
         # Use default values for other features
